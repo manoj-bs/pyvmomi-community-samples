@@ -86,8 +86,34 @@ def add_nic(si, vm, network_name):
     """
     :param si: Service Instance
     :param vm: Virtual Machine Object
-    :param network_name: Name of the Virtual Network
+    :param network: Virtual Network
     """
+    spec = vim.vm.ConfigSpec()
+    nic_changes = []
+
+    nic_spec = vim.vm.device.VirtualDeviceSpec()
+    nic_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
+    nic_spec.device = vim.vm.device.VirtualVmxnet3()
+    nic_spec.device.wakeOnLanEnabled = True
+    nic_spec.device.deviceInfo = vim.Description()
+    nic_spec.device.backing = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
+    content = si.RetrieveContent()
+    nic_spec.device.backing.network = get_obj(content, [vim.Network], network)
+    nic_spec.device.backing.deviceName = network
+
+    nic_spec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
+    nic_spec.device.connectable.startConnected = True
+    nic_spec.device.connectable.allowGuestControl = True
+
+    nic_changes.append(nic_spec)
+    spec.deviceChange = nic_changes
+    e = vm.ReconfigVM_Task(spec=spec)
+    print("NIC CARD ADDED")
+    
+    """
+    ********************
+    *******Old Code*****
+    ********************
     spec = vim.vm.ConfigSpec()
     nic_changes = []
 
@@ -126,7 +152,7 @@ def add_nic(si, vm, network_name):
     spec.deviceChange = nic_changes
     e = vm.ReconfigVM_Task(spec=spec)
     print("NIC CARD ADDED")
-
+    """
 
 def main():
     args = get_args()
