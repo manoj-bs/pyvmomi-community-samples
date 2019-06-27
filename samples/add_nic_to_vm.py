@@ -98,8 +98,8 @@ def add_nic(si, vm, network_name):
     nic_spec.device.deviceInfo = vim.Description()
     nic_spec.device.backing = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
     content = si.RetrieveContent()
-    nic_spec.device.backing.network = get_obj(content, [vim.Network], network)
-    nic_spec.device.backing.deviceName = network
+    nic_spec.device.backing.network = get_obj(content, [vim.Network], network_name)
+    nic_spec.device.backing.deviceName = network_name
 
     nic_spec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
     nic_spec.device.connectable.startConnected = True
